@@ -1,0 +1,139 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-gradient-to-br from-gray-900 via-red-950 to-black text-gray-100 font-inter antialiased;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply px-8 py-4 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600
+           rounded-lg font-semibold text-lg transition-all duration-300
+           shadow-[0_0_20px_rgba(220,38,38,0.5)] hover:shadow-[0_0_30px_rgba(220,38,38,0.8)]
+           hover:-translate-y-1;
+  }
+
+  .btn-secondary {
+    @apply px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600
+           rounded-lg font-semibold text-lg transition-all duration-300
+           shadow-[0_0_20px_rgba(37,99,235,0.5)] hover:shadow-[0_0_30px_rgba(37,99,235,0.8)]
+           hover:-translate-y-1;
+  }
+
+  .card-purple {
+    @apply bg-gradient-to-br from-red-900/40 to-black p-6 rounded-lg border border-red-500/30
+           hover:shadow-[0_0_25px_rgba(220,38,38,0.8)] transition-all duration-300 hover:-translate-y-2;
+  }
+
+  .card-gold {
+    @apply bg-gradient-to-br from-blue-900/40 to-black p-6 rounded-lg border border-blue-500/30
+           hover:shadow-[0_0_25px_rgba(37,99,235,0.8)] transition-all duration-300 hover:-translate-y-2;
+  }
+
+  .title-glow {
+    @apply text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-blue-400 font-cinzel font-bold;
+  }
+
+  .game-tile {
+    @apply bg-gradient-to-br from-red-900/60 to-black p-6 rounded-lg border-2 border-red-500/40
+           cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-[0_0_30px_rgba(220,38,38,0.8)]
+           flex items-center justify-center aspect-square text-5xl;
+  }
+
+  .game-tile.selected {
+    @apply border-blue-500 shadow-[0_0_30px_rgba(37,99,235,0.8)] scale-105;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+
+  .game-tile.matched {
+    @apply opacity-50 pointer-events-none;
+    animation: flip-tile 0.6s ease-in-out;
+  }
+}
+
+@layer utilities {
+  .text-glow-purple {
+    text-shadow: 0 0 20px rgba(220, 38, 38, 0.8);
+  }
+
+  .text-glow-gold {
+    text-shadow: 0 0 20px rgba(37, 99, 235, 0.8);
+  }
+
+  .animate-glow {
+    animation: glowText 3s ease-in-out infinite;
+  }
+}
+
+@keyframes glowText {
+  0%, 100% {
+    text-shadow: 0 0 20px rgba(220, 38, 38, 0.8), 0 0 40px rgba(37, 99, 235, 0.6);
+  }
+  50% {
+    text-shadow: 0 0 30px rgba(220, 38, 38, 1), 0 0 60px rgba(37, 99, 235, 0.8);
+  }
+}
+
+@keyframes flip-tile {
+  0% { transform: rotateY(0deg); }
+  50% { transform: rotateY(90deg); }
+  100% { transform: rotateY(0deg); }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(220, 38, 38, 0.5), 0 0 40px rgba(37, 99, 235, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(220, 38, 38, 0.8), 0 0 60px rgba(37, 99, 235, 0.5);
+  }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bounce-slow {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+.animate-slideIn {
+  animation: slideIn 0.5s ease-out;
+}
+
+.animate-bounce-slow {
+  animation: bounce-slow 2s ease-in-out infinite;
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
