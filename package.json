@@ -1,0 +1,30 @@
+{
+  "name": "helldejaneiro",
+  "version": "1.0.0",
+  "description": "Hell de Janeiro - Dark Harmony Game",
+  "main": "index.js",
+  "scripts": {
+    "dev": "cd frontend && npm run dev",
+    "build": "cd frontend && npm install && npm run build",
+    "preview": "cd frontend && npm run preview",
+    "install-all": "cd frontend && npm install"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/liniker/helldejaneiro.git"
+  },
+  "keywords": [
+    "game",
+    "react",
+    "vite",
+    "tailwind",
+    "rio",
+    "dracopunk"
+  ],
+  "author": "Liniker",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/liniker/helldejaneiro/issues"
+  },
+  "homepage": "https://github.com/liniker/helldejaneiro#readme"
+}

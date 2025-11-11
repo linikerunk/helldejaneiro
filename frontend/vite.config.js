@@ -12,5 +12,18 @@ export default defineConfig({
     allowedHosts: [
       'e87596155761.ngrok-free.app'
     ]
+  },
+  build: {
+    outDir: 'dist',
+    assetsDir: 'assets',
+    sourcemap: false,
+    minify: 'terser',
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom', 'react-router-dom']
+        }
+      }
+    }
   }
 })
