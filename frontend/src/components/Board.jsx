@@ -1,44 +1,47 @@
 import { useState } from 'react'
+import { chanceCards } from '../utils/chanceCards'
+import { factionChestCards } from '../utils/factionChestCards'
+import { weapons, getRarityColor } from '../utils/weapons'
 
 // Dados das casas do tabuleiro (30 casas como Banco Imobiliário)
 const boardSpaces = [
   // Lado inferior (0-7)
   { id: 0, nome: 'INÍCIO', tipo: 'inicio', cor: 'green', icon: '🏁', evento: 'Receba 200 ao passar' },
   { id: 1, nome: 'Morro do Alemão', tipo: 'territorio', cor: 'red', icon: '🏔️', preco: 600, renda: 50, description: "Rode um dado se cair mais de 6 você deve 200 reias para o chefe da boca." },
-  { id: 2, nome: 'Cofre da Facção', tipo: 'evento', cor: 'amber', icon: '💰', evento: 'Pegue uma carta' },
-  { id: 3, nome: 'Rocinha', tipo: 'territorio', cor: 'red', icon: '🏘️', preco: 600, renda: 50 },
-  { id: 4, nome: 'Complexo do Alemão', tipo: 'territorio', cor: 'red', icon: '🏚️', preco: 800, renda: 70 },
+  { id: 2, nome: 'Cofre da Facção', tipo: 'evento', cor: 'amber', icon: '💰', evento: 'Pegue uma carta (30 cartas disponíveis)', deck: 'faction' },
+  { id: 3, nome: 'Rocinha', tipo: 'territorio', cor: 'red', icon: '🏘️', preco: 600, renda: 50, description: "A maior favela do Rio! Role um dado: se cair 5 ou 6, receba 100 de pedágio dos visitantes." },
+  { id: 4, nome: 'Complexo do Alemão', tipo: 'territorio', cor: 'red', icon: '🏚️', preco: 800, renda: 70, description: "Complexo fortificado. Se outro jogador cair aqui, pague 150 de segurança ou perca 1 turno." },
   { id: 5, nome: 'Boca de Fumo', tipo: 'especial', cor: 'purple', icon: '💊', evento: 'Pague taxa de 150' },
-  { id: 6, nome: 'Vidigal', tipo: 'territorio', cor: 'blue', icon: '🌊', preco: 1000, renda: 90 },
-  { id: 7, nome: 'Chance', tipo: 'chance', cor: 'orange', icon: '❓', evento: 'Pegue uma carta de Chance' },
+  { id: 6, nome: 'Vidigal', tipo: 'territorio', cor: 'blue', icon: '🌊', preco: 1000, renda: 90, description: "Vista privilegiada! Cobre taxa dupla se você controla também Leblon ou Ipanema." },
+  { id: 7, nome: 'Chance', tipo: 'chance', cor: 'orange', icon: '❓', evento: 'Pegue uma carta de Chance (30 cartas disponíveis)', deck: 'chance' },
 
   // Lado direito (8-14)
   { id: 8, nome: 'DELEGACIA', tipo: 'prisao', cor: 'gray', icon: '🚔', evento: 'Preso! Perca 1 turno' },
-  { id: 9, nome: 'Cidade de Deus', tipo: 'territorio', cor: 'blue', icon: '🏙️', preco: 1200, renda: 100 },
+  { id: 9, nome: 'Cidade de Deus', tipo: 'territorio', cor: 'blue', icon: '🏙️', preco: 1200, renda: 100, description: "Território disputado. Role 2 dados: se somar 7, evite confronto. Se não, pague 100 ao banco." },
   { id: 10, nome: 'Depósito de Armas', tipo: 'especial', cor: 'red', icon: '🔫', evento: 'Compre armas' },
-  { id: 11, nome: 'Jacarezinho', tipo: 'territorio', cor: 'blue', icon: '🐊', preco: 1400, renda: 110 },
-  { id: 12, nome: 'Maré', tipo: 'territorio', cor: 'blue', icon: '🌊', preco: 1600, renda: 120 },
-  { id: 13, nome: 'Cofre da Facção', tipo: 'evento', cor: 'amber', icon: '💰', evento: 'Pegue uma carta' },
-  { id: 14, nome: 'Providência', tipo: 'territorio', cor: 'purple', icon: '⛪', preco: 1800, renda: 140 },
+  { id: 11, nome: 'Jacarezinho', tipo: 'territorio', cor: 'blue', icon: '🐊', preco: 1400, renda: 110, description: "Beco perigoso. Jogadores que caírem aqui pagam 80 de passagem ou recuam 2 casas." },
+  { id: 12, nome: 'Maré', tipo: 'territorio', cor: 'blue', icon: '🌊', preco: 1600, renda: 120, description: "Labirinto de vielas. Se você possui 3 territórios azuis, a renda aqui dobra!" },
+  { id: 13, nome: 'Cofre da Facção', tipo: 'evento', cor: 'amber', icon: '💰', evento: 'Pegue uma carta (30 cartas disponíveis)', deck: 'faction' },
+  { id: 14, nome: 'Providência', tipo: 'territorio', cor: 'purple', icon: '⛪', preco: 1800, renda: 140, description: "Primeira favela do Rio. Receba bônus de 50 ao passar pelo INÍCIO se você controla esta casa." },
 
   // Lado superior (15-22)
   { id: 15, nome: 'IGREJA', tipo: 'igreja', cor: 'purple', icon: '⛪', evento: 'Lave dinheiro aqui' },
-  { id: 16, nome: 'Complexo da Penha', tipo: 'territorio', cor: 'purple', icon: '🏔️', preco: 2000, renda: 150 },
-  { id: 17, nome: 'Chance', tipo: 'chance', cor: 'orange', icon: '❓', evento: 'Pegue uma carta de Chance' },
-  { id: 18, nome: 'Salgueiro', tipo: 'territorio', cor: 'purple', icon: '🎭', preco: 2200, renda: 160 },
-  { id: 19, nome: 'Mangueira', tipo: 'territorio', cor: 'green', icon: '🎵', preco: 2400, renda: 170 },
+  { id: 16, nome: 'Complexo da Penha', tipo: 'territorio', cor: 'purple', icon: '🏔️', preco: 2000, renda: 150, description: "Fortaleza estratégica. Imune a eventos de 'Chance' enquanto você controla este território." },
+  { id: 17, nome: 'Chance', tipo: 'chance', cor: 'orange', icon: '❓', evento: 'Pegue uma carta de Chance (30 cartas disponíveis)', deck: 'chance' },
+  { id: 18, nome: 'Salgueiro', tipo: 'territorio', cor: 'purple', icon: '🎭', preco: 2200, renda: 160, description: "Escola de samba famosa. Durante o carnaval (a cada 5 turnos), renda aumenta em 100." },
+  { id: 19, nome: 'Mangueira', tipo: 'territorio', cor: 'green', icon: '🎵', preco: 2400, renda: 170, description: "Verde e rosa. Se você controla Salgueiro e Beija-Flor juntos, receba 200 extras por turno." },
   { id: 20, nome: 'Rota de Fuga', tipo: 'especial', cor: 'blue', icon: '🏃', evento: 'Mova-se 3 casas extras' },
-  { id: 21, nome: 'Beija-Flor', tipo: 'territorio', cor: 'green', icon: '🐦', preco: 2600, renda: 180 },
-  { id: 22, nome: 'Cofre da Facção', tipo: 'evento', cor: 'amber', icon: '💰', evento: 'Pegue uma carta' },
+  { id: 21, nome: 'Beija-Flor', tipo: 'territorio', cor: 'green', icon: '🐦', preco: 2600, renda: 180, description: "Nilópolis é poder! Role um dado: se tirar 6, escolha qual jogador deve pagar 150 para você." },
+  { id: 22, nome: 'Cofre da Facção', tipo: 'evento', cor: 'amber', icon: '💰', evento: 'Pegue uma carta (30 cartas disponíveis)', deck: 'faction' },
 
   // Lado esquerdo (23-29)
   { id: 23, nome: 'CONFRONTO', tipo: 'confronto', cor: 'red', icon: '⚔️', evento: 'Guerra de facções!' },
-  { id: 24, nome: 'Copacabana', tipo: 'territorio', cor: 'green', icon: '🏖️', preco: 3000, renda: 200 },
+  { id: 24, nome: 'Copacabana', tipo: 'territorio', cor: 'green', icon: '🏖️', preco: 3000, renda: 200, description: "Praia nobre. Ganhe 50 extras de cada jogador que cair aqui se você controla Ipanema também." },
   { id: 25, nome: 'Boca de Fumo', tipo: 'especial', cor: 'purple', icon: '💊', evento: 'Pague taxa de 200' },
-  { id: 26, nome: 'Ipanema', tipo: 'territorio', cor: 'green', icon: '🌴', preco: 3200, renda: 220 },
-  { id: 27, nome: 'Leblon', tipo: 'territorio', cor: 'green', icon: '💎', preco: 3500, renda: 250 },
-  { id: 28, nome: 'Chance', tipo: 'chance', cor: 'orange', icon: '❓', evento: 'Pegue uma carta de Chance' },
-  { id: 29, nome: 'Barra da Tijuca', tipo: 'territorio', cor: 'green', icon: '🏢', preco: 4000, renda: 300 },
+  { id: 26, nome: 'Ipanema', tipo: 'territorio', cor: 'green', icon: '🌴', preco: 3200, renda: 220, description: "Garota de Ipanema. Turistas pagam dobrado: se outro jogador cai aqui, paga 150 de taxa." },
+  { id: 27, nome: 'Leblon', tipo: 'territorio', cor: 'green', icon: '💎', preco: 3500, renda: 250, description: "Bairro mais caro. Todos os jogadores pagam 100 ao banco quando você compra esta propriedade." },
+  { id: 28, nome: 'Chance', tipo: 'chance', cor: 'orange', icon: '❓', evento: 'Pegue uma carta de Chance (30 cartas disponíveis)', deck: 'chance' },
+  { id: 29, nome: 'Barra da Tijuca', tipo: 'territorio', cor: 'green', icon: '🏢', preco: 4000, renda: 300, description: "Condomínios de luxo. Território mais valioso: a renda dobra se você controla 4 territórios verdes." },
 ]
 
 // Profissões disponíveis para os jogadores
@@ -54,6 +57,10 @@ function Board() {
   const [dice1, setDice1] = useState(1)
   const [dice2, setDice2] = useState(1)
   const [selectedSpace, setSelectedSpace] = useState(null)
+  const [selectedCard, setSelectedCard] = useState(null)
+  const [showWeapons, setShowWeapons] = useState(false)
+  const [chanceCardsDeck, setChanceCardsDeck] = useState([...chanceCards])
+  const [factionCardsDeck, setFactionCardsDeck] = useState([...factionChestCards])
   const [players, setPlayers] = useState([
     { id: 1, profissao: professions[0], position: 0 },
     { id: 2, profissao: professions[1], position: 0 },
@@ -61,6 +68,18 @@ function Board() {
     { id: 4, profissao: professions[3], position: 0 }
   ])
   const [currentPlayer, setCurrentPlayer] = useState(0)
+
+  const drawCard = (deckType) => {
+    if (deckType === 'chance' && chanceCardsDeck.length > 0) {
+      const randomIndex = Math.floor(Math.random() * chanceCardsDeck.length)
+      const card = chanceCardsDeck[randomIndex]
+      setSelectedCard(card)
+    } else if (deckType === 'faction' && factionCardsDeck.length > 0) {
+      const randomIndex = Math.floor(Math.random() * factionCardsDeck.length)
+      const card = factionCardsDeck[randomIndex]
+      setSelectedCard(card)
+    }
+  }
 
   const rollDice = () => {
     setDiceRolling(true)
@@ -90,6 +109,12 @@ function Board() {
         if (player.position === 8) {
           player.preso = true
           player.turnosPreso = 2
+        }
+
+        // Verifica se caiu em casa de carta
+        const landedSpace = boardSpaces[player.position]
+        if (landedSpace.deck) {
+          setTimeout(() => drawCard(landedSpace.deck), 500)
         }
 
         return newPlayers
@@ -321,6 +346,115 @@ function Board() {
           </div>
         </div>
 
+        {/* Modal de Arsenal */}
+        {showWeapons && (
+          <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 animate-fadeIn overflow-y-auto p-4" onClick={() => setShowWeapons(false)}>
+            <div className="bg-gradient-to-br from-gray-800 to-gray-900 p-8 rounded-2xl border-4 border-red-500 shadow-[0_0_50px_rgba(220,38,38,0.5)] max-w-6xl w-full mx-4 my-8 animate-slideIn" onClick={(e) => e.stopPropagation()}>
+              <div className="flex justify-between items-center mb-6">
+                <div>
+                  <h2 className="text-4xl font-cinzel font-bold text-red-400 mb-2">
+                    🔫 Arsenal de Armas
+                  </h2>
+                  <p className="text-gray-400">30 armas disponíveis para compra</p>
+                </div>
+                <button
+                  onClick={() => setShowWeapons(false)}
+                  className="text-gray-400 hover:text-white text-3xl"
+                >
+                  ✕
+                </button>
+              </div>
+
+              {/* Grid de Armas */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[70vh] overflow-y-auto pr-2">
+                {weapons.map((weapon) => (
+                  <div
+                    key={weapon.id}
+                    className={`
+                      bg-gradient-to-br from-gray-700/50 to-gray-800/50 p-4 rounded-xl
+                      border-2 ${getRarityColor(weapon.rarity)}
+                      hover:scale-105 transition-all duration-300
+                      hover:shadow-[0_0_20px_rgba(220,38,38,0.5)]
+                      cursor-pointer
+                    `}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="text-4xl">{weapon.icon}</div>
+                      <div className="flex-1">
+                        <h3 className="text-lg font-bold text-white mb-1">
+                          {weapon.name}
+                        </h3>
+                        <div className="text-xs text-gray-400 mb-2">
+                          {weapon.type} • {weapon.rarity}
+                        </div>
+                        <p className="text-sm text-gray-300 mb-3 leading-tight">
+                          {weapon.description}
+                        </p>
+                        <div className="flex justify-between items-center">
+                          <div className="flex gap-3">
+                            <span className="text-amber-400 font-bold text-sm">
+                              💰 ${weapon.price}
+                            </span>
+                            <span className="text-red-400 font-bold text-sm">
+                              ⚔️ {weapon.damage}
+                            </span>
+                          </div>
+                          <button className="px-3 py-1 bg-red-600 hover:bg-red-700 rounded text-xs font-bold transition-colors">
+                            Comprar
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Legenda de Raridades */}
+              <div className="mt-6 pt-6 border-t border-gray-700">
+                <h4 className="text-sm font-bold text-gray-400 mb-3">RARIDADES:</h4>
+                <div className="flex flex-wrap gap-3">
+                  <span className="text-sm text-gray-400">⚪ Comum</span>
+                  <span className="text-sm text-green-400">🟢 Incomum</span>
+                  <span className="text-sm text-blue-400">🔵 Raro</span>
+                  <span className="text-sm text-purple-400">🟣 Épico</span>
+                  <span className="text-sm text-amber-400">🟡 Lendário</span>
+                  <span className="text-sm text-red-400">🔴 Mítico</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Modal de Carta */}
+        {selectedCard && (
+          <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 animate-fadeIn" onClick={() => setSelectedCard(null)}>
+            <div className="bg-gradient-to-br from-gray-800 to-gray-900 p-8 rounded-2xl border-4 border-amber-500 shadow-[0_0_50px_rgba(251,191,36,0.5)] max-w-md mx-4 animate-slideIn" onClick={(e) => e.stopPropagation()}>
+              <div className="text-center">
+                <div className="text-6xl mb-4">
+                  {selectedCard.type === 'money' && selectedCard.value > 0 ? '💰' : 
+                   selectedCard.type === 'money' && selectedCard.value < 0 ? '💸' :
+                   selectedCard.type === 'special' ? '⭐' :
+                   selectedCard.type === 'movement' ? '🏃' : '🎲'}
+                </div>
+                <h3 className="text-3xl font-cinzel font-bold text-amber-400 mb-4">
+                  {selectedCard.title}
+                </h3>
+                <p className="text-gray-200 text-lg mb-6 leading-relaxed">
+                  {selectedCard.description}
+                </p>
+                <div className="flex gap-4 justify-center">
+                  <button
+                    onClick={() => setSelectedCard(null)}
+                    className="px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 rounded-lg font-bold transition-all duration-300 shadow-lg hover:shadow-xl"
+                  >
+                    Fechar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Painel de Informações da Casa Selecionada */}
         {selectedSpace && (
           <div className="mt-8 bg-gradient-to-br from-gray-800/80 to-gray-900/80 p-6 rounded-xl border-2 border-amber-500/50 animate-slideIn">
@@ -350,6 +484,22 @@ function Board() {
                   <p className="text-amber-200 italic mt-3">
                     {selectedSpace.evento}
                   </p>
+                  {selectedSpace.deck && (
+                    <button
+                      onClick={() => drawCard(selectedSpace.deck)}
+                      className="mt-4 px-6 py-2 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 rounded-lg font-bold transition-all duration-300 shadow-lg hover:shadow-xl"
+                    >
+                      🎴 Pegar Carta
+                    </button>
+                  )}
+                  {selectedSpace.id === 10 && (
+                    <button
+                      onClick={() => setShowWeapons(true)}
+                      className="mt-4 px-6 py-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 rounded-lg font-bold transition-all duration-300 shadow-lg hover:shadow-xl"
+                    >
+                      🔫 Ver Arsenal (30 armas)
+                    </button>
+                  )}
                 </div>
               </div>
               <button
